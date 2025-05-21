@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профориентация</title>
+</head>
+<body>
+    <h1>Узнай, кем стать</h1>
+    <form id="profession-form">
+        <label for="profession">Введите профессию:</label><br>
+        <input type="text" id="profession" name="profession" required><br><br>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <h2>Ответ:</h2>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('profession-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const profession = document.getElementById('profession').value;
+            const responseElement = document.getElementById('response');
+
+            try {
+                const res = await fetch('https://nojugiksil.beget.app/webhook/career-route', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ profession }),
+                });
+
+                const text = await res.text();  // так как у тебя "Text" в Respond to Webhook
+                responseElement.textContent = text;
+
+            } catch (error) {
+                responseElement.textContent = 'Ошибка: ' + error;
+            }
+        });
+    </script>
+</body>
+</html>
