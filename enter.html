@@ -1,43 +1,253 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Профориентация</title>
+  <meta charset="UTF-8">
+  <title>Узнай, кем стать</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin: 30px 0 20px;
+      text-align: center;
+    }
+
+    form {
+      margin: 20px 0;
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #5c67f2;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #5c67f2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #4a54e1;
+    }
+
+    #response {
+      margin: 30px 0;
+      width: 100%;
+      max-width: 600px;
+      padding: 25px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .response-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .step {
+      margin-bottom: 20px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .step-number {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: #5c67f2;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .step-content {
+      margin-left: 40px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .step-details {
+      color: #555;
+      line-height: 1.6;
+      margin-left: 15px;
+    }
+
+    .step-details ul {
+      margin: 5px 0;
+      padding-left: 20px;
+      list-style-type: none;
+    }
+
+    .step-details li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .step-details li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #5c67f2;
+      font-size: 18px;
+    }
+
+    .loading {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .error {
+      color: #e74c3c;
+      padding: 15px;
+      background-color: #fdecea;
+      border-radius: 8px;
+    }
+
+    .general-advice {
+      color: #555;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
-    <h1>Узнай, кем стать</h1>
-    <form id="profession-form">
-        <label for="profession">Введите профессию:</label><br>
-        <input type="text" id="profession" name="profession" required><br><br>
-        <button type="submit">Отправить</button>
-    </form>
+  <h1>Узнай, кем стать</h1>
 
-    <h2>Ответ:</h2>
-    <pre id="response"></pre>
+  <form onsubmit="send(event)">
+    <div class="input-group">
+      <input type="text" id="profession" placeholder="Введите профессию" required>
+      <button type="submit">Отправить</button>
+    </div>
+  </form>
 
-    <script>
-        document.getElementById('profession-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
+  <div id="response">
+    <div class="loading">Введите профессию и нажмите "Отправить"</div>
+  </div>
 
-            const profession = document.getElementById('profession').value;
-            const responseElement = document.getElementById('response');
+  <script>
+    async function send(event) {
+      event.preventDefault();
+      const profession = document.getElementById('profession').value;
+      const responseElement = document.getElementById('response');
+      responseElement.innerHTML = '<div class="loading">Ищем информацию...</div>';
 
-            try {
-                const res = await fetch('https://nojugiksil.beget.app/webhook/career-route', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ profession }),
-                });
-
-                const text = await res.text();  // так как у тебя "Text" в Respond to Webhook
-                responseElement.textContent = text;
-
-            } catch (error) {
-                responseElement.textContent = 'Ошибка: ' + error;
-            }
+      try {
+        const res = await fetch('https://nojugiksil.beget.app/webhook/career-route', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ profession })
         });
-    </script>
+
+        const text = await res.text();
+        displayResponse(text);
+      } catch (error) {
+        responseElement.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+      }
+    }
+
+    function displayResponse(text) {
+      const responseElement = document.getElementById('response');
+
+      // Удаляем лишние символы и одиночные цифры
+      const cleanedText = text
+        .replace(/\*\*/g, '') // Удаляем двойные звездочки
+        .replace(/^\d+$[\r\n]*/gm, '') // Удаляем строки, содержащие только цифры
+        .replace(/\[ \]/g, '') // Удаляем квадратные скобки
+        .replace(/\d+\.\s+\d+\./g, match => { // Исправляем двойную нумерацию
+          const parts = match.split('.');
+          return `${parts[0]}.`;
+        })
+        .trim();
+
+      // Разделяем на основной текст и шаги
+      const parts = cleanedText.split(/(?=\d+\.)/);
+      const introText = parts[0];
+      const steps = parts.slice(1).filter(step => step.trim().length > 3);
+
+      // Создаем HTML для ответа
+      let html = `
+        <div class="response-title">Рекомендации для профессии "${document.getElementById('profession').value}"</div>
+        <div class="general-advice">${introText.trim()}</div>
+      `;
+
+      // Обрабатываем шаги
+      steps.forEach((step, index) => {
+        const [title, ...details] = step.split(':');
+        const content = details.join(':').trim();
+
+        // Форматируем подпункты
+        const subItems = content.split('\n')
+          .filter(item => item.trim().length > 0 && !/^\d+$/.test(item.trim())) // Фильтруем одиночные цифры
+          .map(item => `<li>${item.replace(/^[-•*]\s*/, '').trim()}</li>`)
+          .join('');
+
+        html += `
+          <div class="step">
+            <div class="step-number">${index + 1}</div>
+            <div class="step-content">
+              <div class="step-title">${title.replace(/^\d+\./, '').trim()}</div>
+              ${subItems ? `<div class="step-details"><ul>${subItems}</ul></div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      responseElement.innerHTML = html;
+    }
+  </script>
 </body>
 </html>
